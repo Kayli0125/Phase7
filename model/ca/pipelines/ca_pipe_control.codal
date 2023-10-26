@@ -31,6 +31,66 @@ event pipeline_control : pipeline(pipe.IF)
 {
     semantics
     {
+        print_pipeline();
+        if(s_if_stall){
+            pipe.IF.stall();
+            codasip_info(INFO_PIPE, "Pipeline IF stall\n");
+        }
+    };
+};
 
+event pipeline_control : pipeline(pipe.ID)
+{
+    semantics{
+        if(s_id_stall){
+            pipe.ID.stall();
+            codasip_info(INFO_PIPE, "Pipeline ID stall\n");
+        }
+        if(s_id_clear){
+            pipe.ID.clear();
+            codasip_info(INFO_PIPE, "Pipeline ID clear\n");
+        }
+    };
+};
+
+event pipeline_control : pipeline(pipe.EX)
+{
+    semantics{
+        if(s_ex_stall){
+            pipe.EX.stall();
+            codasip_info(INFO_PIPE, "Pipeline EX stall\n");
+        }
+        if(s_ex_clear){
+            pipe.EX.clear();
+            codasip_info(INFO_PIPE, "Pipeline EX clear\n");
+        }
+    };
+};
+
+event pipeline_control : pipeline(pipe.ME)
+{
+    semantics{
+        if(s_me_stall){
+            pipe.ME.stall();
+            codasip_info(INFO_PIPE, "Pipeline ME stall\n");
+        }
+        if(s_me_clear){
+            pipe.ME.clear();
+            codasip_info(INFO_PIPE, "Pipeline ME clear\n");
+        }
+    };
+};
+
+event pipeline_control : pipeline(pipe.WB)
+{
+    semantics{
+        if(s_wb_stall){
+            pipe.WB.stall();
+            codasip_info(INFO_PIPE, "Pipeline WB stall\n");
+        }
+        if(s_wb_clear){
+            pipe.WB.clear();
+            codasip_info(INFO_PIPE, "Pipeline WB clear\n");
+        }
     };
 };
