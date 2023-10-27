@@ -132,4 +132,4 @@ element i_hw_alu_i
         // HALT Command
         s_id_halt = HALT_NOHALT;
     };
-}
+};
