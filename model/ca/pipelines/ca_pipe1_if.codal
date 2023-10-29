@@ -65,8 +65,8 @@ event if_output : pipeline(pipe.IF)
 {
     semantics
     {
-        r_pc = s_if_nextpc;
         r_id_pc = r_pc;
+        r_pc = s_if_nextpc;
         r_id_clear = s_id_clear;
     };
 };
