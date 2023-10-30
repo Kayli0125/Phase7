@@ -127,7 +127,7 @@ element i_hw_alu_i
         }
 
         // Operand MUXes
-        s_id_alusrc2 = ALU2_REG;
+        s_id_alusrc2 = ALU2_IMM;
 
         // HALT Command
         s_id_halt = HALT_NOHALT;
