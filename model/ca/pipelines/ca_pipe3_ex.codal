@@ -36,12 +36,62 @@ event ex : pipeline(pipe.EX)
 
     semantics
     {
+        // Data Hazard forwarding controls MUXs
+        if ((r_me_regwrite == WE_TRUE) && (r_me_rd == r_ex_src1) && (r_me_rd != 0)){
+            s_ex_fwdA_sel = FWDA_ME_ALU;
+        }
+        else if ((r_wb_regwrite == WE_TRUE) && (r_wb_rd == r_ex_src1) && (r_wb_rd != 0)){
+            s_ex_fwdA_sel = FWDA_WB_RD;
+        }
+        else{
+            s_ex_fwdA_sel = FWDA_SRC;
+        }
+
+        if ((r_me_regwrite == WE_TRUE) && (r_me_rd == r_ex_src2) && (r_me_rd != 0)){
+            s_ex_fwdB_sel = FWDB_ME_ALU;
+        }
+        else if ((r_wb_regwrite == WE_TRUE) && (r_wb_rd == r_ex_src2) && (r_wb_rd != 0)){
+            s_ex_fwdB_sel = FWDB_WB_RD;
+        }
+        else{
+            s_ex_fwdB_sel = FWDB_SRC;
+        }
+
+        switch(s_ex_fwdA_sel){
+            case FWDA_SRC:
+                s_ex_fwdA_src1 = r_ex_reg1;
+                break;
+            case FWDA_ME_ALU:
+                s_ex_fwdA_src1 = r_me_alu;
+                break;
+            case FWDA_WB_RD:
+                s_ex_fwdA_src1 = r_wb_alu;
+                break;
+            default:
+                s_ex_fwdA_src1 = 0;
+                break;
+        }
+
+        switch(s_ex_fwdB_sel){
+            case FWDB_SRC:
+                s_ex_fwdB_src2 = r_ex_reg2;
+                break;
+            case FWDB_ME_ALU:
+                s_ex_fwdB_src2 = r_me_alu;
+                break;
+            case FWDB_WB_RD:
+                s_ex_fwdB_src2 = r_wb_alu;
+                break;
+            default:
+                s_ex_fwdB_src2 = 0;
+                break;
+        }
 
         // Multiplexor implementation
         switch (r_ex_alusrc2)
         {
             case ALU2_REG:
-                s_ex_src2 = r_ex_reg2;
+                s_ex_src2 = s_ex_fwdB_src2;
                 break;
             case ALU2_IMM:
                 s_ex_src2 = r_ex_immed;
@@ -49,7 +99,7 @@ event ex : pipeline(pipe.EX)
             default:
                 s_ex_src2 = 0;
                 codasip_fatal(SRC2_ERROR, "Default case: %d\n", r_ex_alusrc2);
-            break;
+                break;
         }
 
         // ALU logic operation
@@ -60,11 +110,12 @@ event ex : pipeline(pipe.EX)
                 s_ex_alu = 0;
                 break;
             case ALU_ADD:
-                s_ex_alu = r_ex_reg1 + s_ex_src2;
+                s_ex_alu = s_ex_fwdA_src1 + s_ex_src2;
                 break;
             default:
                 s_ex_alu = 0;
                 codasip_fatal(SRC2_ERROR, "Default case: %d\n", r_ex_aluop);  
+                break;
         }
 
         // HALT instruction detection
@@ -73,7 +124,7 @@ event ex : pipeline(pipe.EX)
             codasip_break();
             codasip_info(INFO_GENERAL, "Halt Instructions Indicated");
         }
-
+    
         // Timing
         ex_output();
     };
