@@ -132,7 +132,7 @@ event id_output : pipeline(pipe.ID)
 
         r_ex_src1 = s_id_rs1;
         r_ex_src2 = s_id_rs2;
-        r_ex_reg1 = s_rff1_out;
-        r_ex_reg1 = s_rff2_out;
+        r_ex_reg1 = s_id_rffsrc1;
+        r_ex_reg2 = s_id_rffsrc2;
     };
 };
