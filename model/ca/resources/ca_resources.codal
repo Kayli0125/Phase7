@@ -79,8 +79,8 @@ signal bit[RFF2_W] s_id_rff2_sel;
 signal bit[WORD_W] s_id_rffsrc1;
 signal bit[WORD_W] s_id_rffsrc2;
 
-register bit[WORD_W] r_id_rffsrc1               {pipeline = pipe.ID};
-register bit[WORD_W] r_id_rffsrc2               {pipeline = pipe.ID};
+register bit[WORD_W] r_id_rffsrc1               {pipeline = pipe.ID; };
+register bit[WORD_W] r_id_rffsrc2               {pipeline = pipe.ID; };
 // -------------------------------------------------------------------------------------------------
 // Execute stage
 // -------------------------------------------------------------------------------------------------
@@ -109,8 +109,8 @@ signal bit[FWDB_W] s_ex_fwdB_sel;
 signal bit[WORD_W] s_ex_fwdB_src2; // output of fwdB multiplexor
 signal bit[WORD_W] s_ex_fwdA_src1; // output of fwdA multiplexor
 
-register bit[RF_XPR_W] r_ex_src1                {pipeline = pipe.EX};
-register bit[RF_XPR_W] r_ex_src2                {pipeline = pipe.EX};
+register bit[RF_XPR_W] r_ex_src1                {pipeline = pipe.EX; };
+register bit[RF_XPR_W] r_ex_src2                {pipeline = pipe.EX; };
 
 // -------------------------------------------------------------------------------------------------
 // Memory stage
