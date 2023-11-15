@@ -102,7 +102,7 @@ register bit[INSTR_W] r_ex_reg2                 { pipeline = pipe.EX; };
 register bit[INSTR_W] r_ex_immed                { pipeline = pipe.EX; };
 
 signal bit[INSTR_W] s_ex_alu;
-signal bit[SRC2_W] s_ex_src2;
+signal bit[WORD_W] s_ex_src2;
 
 signal bit[FWDA_W] s_ex_fwdA_sel;
 signal bit[FWDB_W] s_ex_fwdB_sel;

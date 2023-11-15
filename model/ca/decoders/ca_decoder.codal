@@ -35,8 +35,9 @@
 // -------------------------------------------------------------------------------------------------
 
 set dec = i_hw_halt
-                ,i_hw_alu
-                ,i_hw_alu_i
+                ,i_hw_rtype_alu
+                ,i_hw_itype_alu
+                ,i_hw_itype_special
                 ;
 
 // -------------------------------------------------------------------------------------------------
@@ -62,9 +63,22 @@ element i_hw_halt
 
         // Operand MUXes
         s_id_alusrc2 = DONT_CARE;
+        s_id_alusrc1 = DONT_CARE;
 
         // HALT Command
         s_id_halt = HALT_HALT;
+
+        // BRANCH command
+        s_id_brnchop = BRANCH_FALSE;
+
+        // Immediate value
+        s_id_immed = IMM_NONE;
+
+        // Multiplexor select
+        s_id_rfwt_sel = DONT_CARE;
+
+        // Branch selection
+        s_id_brnch_sel = DONT_CARE;
     };
 };
 
@@ -72,7 +86,7 @@ element i_hw_halt
 // Arithmetic instructions
 // -------------------------------------------------------------------------------------------------
 
-element i_hw_alu
+element i_hw_rtype_alu
 {
     use opc_rtype_alu as opc;
 
@@ -89,6 +103,33 @@ element i_hw_alu
             case RTYPE_ADD:
                 s_id_aluop = ALU_ADD;
                 break;
+            case RTYPE_SUB:
+                s_id_aluop = ALU_SUB;
+                break;
+            case RTYPE_AND:
+                s_id_aluop = ALU_AND;
+                break;
+            case RTYPE_OR:
+                s_id_aluop = ALU_OR;
+                break;
+            case RTYPE_XOR:
+                s_id_aluop = ALU_XOR;
+                break;
+            case RTYPE_SLL:
+                s_id_aluop = ALU_SLL;
+                break;
+            case RTYPE_SRL:
+                s_id_aluop = ALU_SRL;
+                break;
+            case RTYPE_SRA:
+                s_id_aluop = ALU_SRA;
+                break;
+            case RTYPE_SLT:
+                s_id_aluop = ALU_SLT;
+                break;
+            case RTYPE_SLTU:
+                s_id_aluop = ALU_SLTU;
+                break;
 
             default:
                 codasip_fatal(ALU_ERROR, "Default case: %d\n", opc);
@@ -97,13 +138,26 @@ element i_hw_alu
 
         // Operand MUXes
         s_id_alusrc2 = ALU2_REG;
+        s_id_alusrc1 = ALU_SRC1_REG;
 
         // HALT Command
         s_id_halt = HALT_NOHALT;
+
+        // BRANCH Command
+        s_id_brnchop = BRANCH_FALSE;
+
+        // Immediate Value
+        s_id_immed = IMM_RTYPE;
+
+        // Multiplexor select  
+        s_id_rfwt_sel = RFWT_ALU;
+
+        // Branch selection
+        s_id_brnch_sel = BRADD_ALU;
     };
 };
 
-element i_hw_alu_i
+element i_hw_itype_alu
 {
     use opc_itype_alu as opc;
 
@@ -120,6 +174,24 @@ element i_hw_alu_i
             case ITYPE_ADDI:
                 s_id_aluop = ALU_ADD;
                 break;
+            case ITYPE_SUBI:
+                s_id_aluop = ALU_SUB;
+                break;
+            case ITYPE_ANDI:
+                s_id_aluop = ALU_AND;
+                break;
+            case ITYPE_ORI:
+                s_id_aluop = ALU_OR;
+                break;
+            case ITYPE_XORI:
+                s_id_aluop = ALU_XOR;
+                break;
+            case ITYPE_SLTI:
+                s_id_aluop = ALU_SLT;
+                break;
+            case ITYPE_SLTIU:
+                s_id_aluop = ALU_SLTU;
+                break;
 
             default:
                 codasip_fatal(ALU_ERROR, "Default case: %d\n", opc);
@@ -128,8 +200,131 @@ element i_hw_alu_i
 
         // Operand MUXes
         s_id_alusrc2 = ALU2_IMM;
+        s_id_alusrc1 = ALU_SRC1_ZERO;
 
         // HALT Command
         s_id_halt = HALT_NOHALT;
+
+        // BRANCH Command
+        s_id_brnchop = BRANCH_FALSE;
+
+        // IMM value
+        s_id_immed = IMM_ITYPE;
+
+        // Multiplexor select
+        s_id_rfwt_sel = RFWT_ALU;
+
+        // Branch selection
+        s_id_brnch_sel = BRADD_ALU;
+    };
+};
+
+element i_hw_itype_special
+{
+    use opc_itype_alu as opc;
+
+    assembly { opc };
+    binary { opc };
+
+    semantics
+    {
+        // Register file write enable
+        s_id_regwrite = WE_TRUE;
+
+        switch (opc)
+        {
+            case IMM_SHIFT_SLLI:
+                s_id_aluop = ALU_SLL;
+                break;
+            case IMM_SHIFT_SRAI:
+                s_id_aluop = ALU_SRA;
+                break;
+            case IMM_SHIFT_SRLI:
+                s_id_aluop = ALU_SRLI;
+                break;
+
+            default:
+                codasip_fatal(ALU_ERROR, "Default case: %d\n", opc);
+                break;
+        }
+
+        // Operand MUXes
+        s_id_alusrc2 = ALU2_IMM;
+        s_id_alusrc1 = ALU_SRC1_ZERO;
+
+        // HALT Command
+        s_id_halt = HALT_NOHALT;
+
+        // BRANCH Command
+        s_id_brnchop = BRANCH_FALSE;
+
+        // IMM value
+        s_id_immed = IMM_ITYPE;
+
+        // Multiplexor select
+        s_id_rfwt_sel = RFWT_ALU;
+
+        // Branch selection
+        s_id_brnch_sel = BRADD_ALU;
+    };
+};
+
+element i_hw_btype_branches
+{
+    use opc_rtype_alu as opc;
+
+    assembly { opc };
+    binary { opc };
+
+    semantics
+    {
+        // Register file write enable
+        s_id_regwrite = WE_TRUE;
+
+        switch (opc)
+        {
+            switch (opc) {
+            case BTYPE_BEQ:
+                BRADD_ALU =  (src1 == src2) ? 1 : 0;
+                break;
+            case BTYPE_BNE:
+                BRADD_ALU = (src1 != src2) ? 1 : 0;
+                break;
+            case BTYPE_BLT:
+                BRADD_ALU = ((int32) src1 < (int32) src2) ? 1 : 0;
+                break;
+            case BTYPE_BGE:
+                BRADD_ALU = ((int32) src1 >= (int32) src2) ? 1 : 0;
+                break;
+            case BTYPE_BLTU:
+                BRADD_ALU = ((uint32) src1 < (uint32) src2) ? 1 : 0;
+                break;
+            case BTYPE_BGEU:
+                BRADD_ALU = ((uint32) src1 >= (uint32) src2) ? 1 : 0;
+                break;
+
+            default:
+                codasip_fatal(ALU_ERROR, "Default case: %d\n", opc);
+                break;
+        }
+
+        // Operand MUXes
+        s_id_alusrc2 = ALU2_REG;
+        s_id_alusrc1 = ALU_SRC1_REG;
+
+        // HALT Command
+        s_id_halt = HALT_NOHALT;
+
+        // BRANCH Command
+        s_id_brnchop = BRANCH_FALSE;
+
+        // Immediate Value
+        s_id_immed = IMM_RTYPE;
+
+        // Multiplexor select  
+        s_id_rfwt_sel = RFWT_ALU;
+
+        // Branch selection
+        s_id_brnch_sel = BRADD_ALU;
     };
 };
