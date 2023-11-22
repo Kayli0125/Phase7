@@ -38,6 +38,7 @@ set dec = i_hw_halt
                 ,i_hw_rtype_alu
                 ,i_hw_itype_alu
                 ,i_hw_itype_special
+                ,i_hw_btype_branches
                 ;
 
 // -------------------------------------------------------------------------------------------------
@@ -279,28 +280,34 @@ element i_hw_btype_branches
     semantics
     {
         // Register file write enable
-        s_id_regwrite = WE_TRUE;
+        s_id_regwrite = WE_FALSE;
 
         switch (opc)
         {
             switch (opc) {
             case BTYPE_BEQ:
-                BRADD_ALU =  (src1 == src2) ? 1 : 0;
+                BRADD_ADDR =  (src1 == src2) ? 1 : 0;
+                s_id_aluop = BRADD_ALU;
                 break;
             case BTYPE_BNE:
-                BRADD_ALU = (src1 != src2) ? 1 : 0;
+                BRADD_ADDR = (src1 != src2) ? 1 : 0;
+                s_id_aluop = BRADD_ALU;
                 break;
             case BTYPE_BLT:
-                BRADD_ALU = ((int32) src1 < (int32) src2) ? 1 : 0;
+                BRADD_ADDR = ((int32) src1 < (int32) src2) ? 1 : 0;
+                s_id_aluop = BRADD_ALU;
                 break;
             case BTYPE_BGE:
-                BRADD_ALU = ((int32) src1 >= (int32) src2) ? 1 : 0;
+                BRADD_ADDR = ((int32) src1 >= (int32) src2) ? 1 : 0;
+                s_id_aluop = BRADD_ALU;
                 break;
             case BTYPE_BLTU:
-                BRADD_ALU = ((uint32) src1 < (uint32) src2) ? 1 : 0;
+                BRADD_ADDR = ((uint32) src1 < (uint32) src2) ? 1 : 0;
+                s_id_aluop = BRADD_ALU;
                 break;
             case BTYPE_BGEU:
-                BRADD_ALU = ((uint32) src1 >= (uint32) src2) ? 1 : 0;
+                BRADD_ADDR = ((uint32) src1 >= (uint32) src2) ? 1 : 0;
+                s_id_aluop = BRADD_ALU;
                 break;
 
             default:
@@ -316,15 +323,15 @@ element i_hw_btype_branches
         s_id_halt = HALT_NOHALT;
 
         // BRANCH Command
-        s_id_brnchop = BRANCH_FALSE;
+        s_id_brnchop = BRANCH_TRUE;
 
         // Immediate Value
         s_id_immed = IMM_RTYPE;
 
         // Multiplexor select  
-        s_id_rfwt_sel = RFWT_ALU;
+        s_id_rfwt_sel = DONT_CARE;
 
         // Branch selection
-        s_id_brnch_sel = BRADD_ALU;
+        s_id_brnch_sel = BRADD_ADDR;
     };
 };

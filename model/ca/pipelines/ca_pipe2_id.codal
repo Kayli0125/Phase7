@@ -63,7 +63,18 @@ event id : pipeline(pipe.ID)
 
         // Immediate decode
         s_id_immed = (int32)(int12)s_id_instr[31..20]; 
-//    -type immediate
+//    - I-type immediate
+
+        s_id_immedb = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) ) << 1;
+
+        s_id_immedu = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) );
+
+        s_id_immedj = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) ) << 1;
+
+        s_id_immedr = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) ) << 1;
+
+
+
 
         // Reading input registers
         s_id_reg1 = rf_xpr.src1[s_id_rs1];

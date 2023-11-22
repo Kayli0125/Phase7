@@ -58,6 +58,7 @@ signal bit[ALUOP_W] s_id_aluop;
 //Control Signals
 signal bit[REGWRITE_W] s_id_regwrite;
 signal bit[SRC2_W] s_id_alusrc2;
+signal bit[ADDR_W] s_id_alusrc1;
 signal bit[HALT_W] s_id_halt;
 
 //Instruction opcode + func3 + func7
@@ -98,6 +99,7 @@ register bit[INSTR_W] r_ex_reg1                 { pipeline = pipe.EX; };
 
 //IMUX Operation Control
 register bit[SRC2_W] r_ex_alusrc2               { pipeline = pipe.EX; };
+register bit[ADDR_W] r_ex_alusrc1               { pipeline = pipe.EX; };
 register bit[INSTR_W] r_ex_reg2                 { pipeline = pipe.EX; };
 register bit[INSTR_W] r_ex_immed                { pipeline = pipe.EX; };
 
