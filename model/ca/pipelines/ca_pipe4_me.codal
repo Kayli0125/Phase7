@@ -35,6 +35,20 @@ event me : pipeline(pipe.ME)
     use me_output;
     semantics
     {
+        switch (r_me_brnchop) {
+            case BRANCH_COND_TRUE:
+                s_me_pcsrc = r_me_zero;
+                break;
+            case BRANCH_COND_FALSE:
+                s_me_pcsrc = r_me_zero;
+                break;
+            case BRANCH_TRUE:
+                break;
+            default:
+                s_me_prcsrc = r_me_zero;
+                break;
+        }
+
         me_output();
     };
 };
@@ -48,5 +62,8 @@ event me_output : pipeline(pipe.ME)
         r_wb_alu = r_me_alu;
         r_wb_rd = r_me_rd;
         r_wb_regwrite = r_me_regwrite;
+        r_wb_target_addr = r_me_target_addr;
+        r_wb_rfwt_sel = r_me_rfwt_sel;
+        
     };
 };

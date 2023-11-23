@@ -69,10 +69,9 @@ event if_output : pipeline(pipe.IF)
 {
     semantics
     {
-        r_id_pc = r_pc;
-        r_pc = s_if_pcin;
-        s_if_pcin = (s_me_pcsrc) ? r_me_bradd : s_if_nextpc;
-        r_id_clear = s_id_clear;
+        r_id_pc = s_if_pcin;
+        r_pc = s_if_nextpc;
+        r_id_clear = 0;
     };
 };
 

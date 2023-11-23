@@ -161,7 +161,22 @@ event ex : pipeline(pipe.EX)
                 break;
         }
 
-        
+        // Add multiplexor branch address select
+        switch (r_ex_brnch_sel)
+        {
+            case BRADD_ALU:
+                s_ex_target_addr = s_ex_alu;
+                break;
+            case BRADD_ADDR:
+                s_ex_target_addr = r_ex_pc + r_ex_immed;
+                break;
+            default:
+                s_ex_target_addr = 0;
+                break;
+        }
+
+        // Add generation of s_ex_zero signal
+        if (s_ex_alu == 0) s_ex_zero = s_ex_alu;
 
         // HALT instruction detection
         if (r_ex_halt == HALT_HALT)
@@ -184,5 +199,9 @@ event ex_output : pipeline(pipe.EX)
         r_me_alu = s_ex_alu;
         r_me_rd = r_ex_rd;
         r_me_regwrite = r_ex_regwrite;
+        r_me_target_addr = s_ex_target_addr;
+        r_me_brnchop = r_ex_brnchop;
+        r_me_rfwt_sel = r_ex_rfwt_sel;
+        r_me_zero = s_ex_zero;
     };
 };

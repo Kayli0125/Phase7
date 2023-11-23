@@ -36,9 +36,14 @@ event wb : pipeline(pipe.WB)
     {
         if (r_wb_regwrite && (r_wb_rd != 0))
         {
-            rf_xpr.wrt0[r_wb_rd] = r_wb_alu ;
+            rf_xpr.wrt0[r_wb_rd] = r_wb_alu;
             codasip_info(INFO_RF_WRITE, "rf_xpr[%d] = 0x%x", r_wb_rd, r_wb_alu);
         }
+
+        // Increment the PC by 4
+        r_wb_pc = r_me_pc + 4;
+
+        // Add multiplexor for Register file write result
 
         // Set local stall.
         s_wb_stall = 0;
