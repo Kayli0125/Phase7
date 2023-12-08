@@ -65,7 +65,7 @@ event ex : pipeline(pipe.EX)
                 s_ex_fwdA_src1 = r_me_alu;
                 break;
             case FWDA_WB_RD:
-                s_ex_fwdA_src1 = r_wb_alu;
+                s_ex_fwdA_src1 = s_wb_result;
                 break;
             default:
                 s_ex_fwdA_src1 = 0;
@@ -80,7 +80,7 @@ event ex : pipeline(pipe.EX)
                 s_ex_fwdB_src2 = r_me_alu;
                 break;
             case FWDB_WB_RD:
-                s_ex_fwdB_src2 = r_wb_alu;
+                s_ex_fwdB_src2 = s_wb_result;
                 break;
             default:
                 s_ex_fwdB_src2 = 0;
@@ -115,7 +115,7 @@ event ex : pipeline(pipe.EX)
                 break;
             default:
                 s_ex_src1 = 0;
-                codasip_fatal(SRC1_ERROR, "Default case: %d\n", r_ex_alusrc1);
+                //codasip_fatal(SRC1_ERROR, "Default case: %d\n", r_ex_alusrc1);
                 break;
         }
 
@@ -176,7 +176,10 @@ event ex : pipeline(pipe.EX)
         }
 
         // Add generation of s_ex_zero signal
-        if (s_ex_alu == 0) s_ex_zero = s_ex_alu;
+        if (s_ex_alu == 0) 
+           s_ex_zero = 1;
+        else 
+           s_ex_zero = 0;
 
         // HALT instruction detection
         if (r_ex_halt == HALT_HALT)

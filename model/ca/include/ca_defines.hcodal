@@ -72,12 +72,12 @@ enum rff2_sel
 
 enum immed
 {
-    IMM_RTYPE,
+    IMM_NONE,
     IMM_ITYPE,
     IMM_JTYPE,
     IMM_UTYPE,
     IMM_BTYPE,
-    IMM_ERROR,
+    IMM_STYPE,
 };
 
 enum branchop

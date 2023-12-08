@@ -62,19 +62,16 @@ event id : pipeline(pipe.ID)
         s_id_rd = s_id_instr[11..7];
 
         // Immediate decode
-        s_id_immed = (int32)(int12)s_id_instr[31..20]; 
+        s_id_immedi = (int32)(int12)s_id_instr[31..20]; 
 //    - I-type immediate
 
-        s_id_immedb = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) ) << 1;
+        s_id_immedb = (( int32 ) ( int12 ) ( s_id_instr[31..31]:: s_id_instr[7..7]:: s_id_instr[30..25]:: s_id_instr[11..8]) ) << 1;
 
-        s_id_immedu = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) );
+        s_id_immedu = (( int32 ) ( int20 ) ( s_id_instr[31..12])) << 12;
 
-        s_id_immedj = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) ) << 1;
+        s_id_immeds = ((int32) (int12) (s_id_instr[31..25] :: s_id_instr[11..7]));
 
-        s_id_immedr = (( int32 ) ( int12 ) ( s_id_instr [31..31]:: s_id_instr [7..7]:: s_id_instr [30..25]:: s_id_instr [11..8]) ) << 1;
-
-
-
+        s_id_immedj = (( int32 ) ( int12 ) ( s_id_instr[31..31]:: s_id_instr[7..7]:: s_id_instr[30..25]:: s_id_instr[11..8]) ) << 1;
 
         // Reading input registers
         s_id_reg1 = rf_xpr.src1[s_id_rs1];
@@ -100,7 +97,7 @@ event id : pipeline(pipe.ID)
                 s_id_rffsrc1 = s_id_reg1;
                 break;
             case RFF1_WB_DATA:
-                s_id_rffsrc1 = r_wb_alu;
+                s_id_rffsrc1 = s_wb_result;
                 break;
             default:
                 s_id_rffsrc1 = 0;
@@ -112,15 +109,40 @@ event id : pipeline(pipe.ID)
                 s_id_rffsrc2 = s_id_reg2;
                 break;
             case RFF2_WB_DATA:
-                s_id_rffsrc2 = r_wb_alu;
+                s_id_rffsrc2 = s_wb_result;
                 break;
             default:
-                s_id_rffsrc2= 0;
+                s_id_rffsrc2 = 0;
                 break;
         }
 
         // Decoder activation
         dec(s_id_opc);
+
+        switch (s_id_immsel) {
+            case IMM_ITYPE:
+                s_id_immed = s_id_immedi;
+                break;
+            case IMM_BTYPE:
+                s_id_immed = s_id_immedb;
+                break;
+            case IMM_UTYPE:
+                s_id_immed = s_id_immedu;
+                break;
+            case IMM_STYPE:
+                s_id_immed = s_id_immeds;
+                break;
+            case IMM_JTYPE:
+                s_id_immed = s_id_immedj;
+                break;
+            case IMM_NONE:
+                s_id_immed = 0;
+                break;
+            default:
+                s_id_immed = 0;
+                codasip_fatal(IMM_NONE, "Default case: %d\n", s_id_immsel);
+                break;
+        }
 
         // Update the registers
         id_output();
@@ -139,11 +161,16 @@ event id_output : pipeline(pipe.ID)
         r_ex_aluop = s_id_aluop;
         r_ex_regwrite = s_id_regwrite;
         r_ex_alusrc2 = s_id_alusrc2;
+        r_ex_alusrc1 = s_id_alusrc1;
         r_ex_halt = s_id_halt;
 
         r_ex_src1 = s_id_rs1;
         r_ex_src2 = s_id_rs2;
         r_ex_reg1 = s_id_rffsrc1;
         r_ex_reg2 = s_id_rffsrc2;
+
+        r_ex_brnch_sel = s_id_brnch_sel;
+        r_ex_rfwt_sel = s_id_rfwt_sel;
+        r_ex_brnchop = s_id_brnchop;
     };
 };

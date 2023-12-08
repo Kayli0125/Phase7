@@ -42,6 +42,7 @@ pipeline pipe
 // -------------------------------------------------------------------------------------------------
 
 signal bit[ADDR_W] s_if_nextpc;
+signal bit[ADDR_W] s_if_pcin;
 
 // -------------------------------------------------------------------------------------------------
 // Decode stage
@@ -58,7 +59,7 @@ signal bit[ALUOP_W] s_id_aluop;
 //Control Signals
 signal bit[REGWRITE_W] s_id_regwrite;
 signal bit[SRC2_W] s_id_alusrc2;
-signal bit[ADDR_W] s_id_alusrc1;
+signal bit[SRC1_W] s_id_alusrc1;
 signal bit[HALT_W] s_id_halt;
 
 //Instruction opcode + func3 + func7
@@ -68,11 +69,18 @@ signal bit[OPC_W] s_id_opc;
 signal bit[RF_XPR_W] s_id_rs1;
 signal bit[RF_XPR_W] s_id_rs2;
 
-signal bit[INSTR_W] s_id_reg1;
-signal bit[INSTR_W] s_id_reg2;
+signal bit[WORD_W] s_id_reg1;
+signal bit[WORD_W] s_id_reg2;
 
 signal bit[RF_XPR_W] s_id_rd;
-signal bit[INSTR_W] s_id_immed;
+signal bit[WORD_W] s_id_immed;
+signal bit[WORD_W] s_id_immedb;
+signal bit[WORD_W] s_id_immedu;
+signal bit[WORD_W] s_id_immedj;
+signal bit[WORD_W] s_id_immeds;
+signal bit[WORD_W] s_id_immedi;
+signal bit[IMMED_W] s_id_immsel;
+
 
 signal bit[RFF1_W] s_id_rff1_sel;
 signal bit[RFF2_W] s_id_rff2_sel;
@@ -82,6 +90,10 @@ signal bit[WORD_W] s_id_rffsrc2;
 
 register bit[WORD_W] r_id_rffsrc1               {pipeline = pipe.ID; };
 register bit[WORD_W] r_id_rffsrc2               {pipeline = pipe.ID; };
+
+signal bit[BRANCH_W] s_id_brnchop;
+signal bit[RFWT_W] s_id_rfwt_sel;
+signal bit[BRADD_W] s_id_brnch_sel;
 // -------------------------------------------------------------------------------------------------
 // Execute stage
 // -------------------------------------------------------------------------------------------------
@@ -105,6 +117,7 @@ register bit[INSTR_W] r_ex_immed                { pipeline = pipe.EX; };
 
 signal bit[INSTR_W] s_ex_alu;
 signal bit[WORD_W] s_ex_src2;
+signal bit[WORD_W] s_ex_src1;
 
 signal bit[FWDA_W] s_ex_fwdA_sel;
 signal bit[FWDB_W] s_ex_fwdB_sel;
@@ -113,6 +126,12 @@ signal bit[WORD_W] s_ex_fwdA_src1; // output of fwdA multiplexor
 
 register bit[RF_XPR_W] r_ex_src1                {pipeline = pipe.EX; };
 register bit[RF_XPR_W] r_ex_src2                {pipeline = pipe.EX; };
+register bit[BRADD_W] r_ex_brnch_sel                {pipeline = pipe.EX; };
+register bit[BRANCH_W] r_ex_brnchop               {pipeline = pipe.EX; };
+
+signal bit[RFWT_W] r_ex_rfwt_sel;
+signal bit[BOOLEAN_BIT] s_ex_zero;
+signal bit[ADDR_W] s_ex_target_addr;
 
 // -------------------------------------------------------------------------------------------------
 // Memory stage
@@ -124,6 +143,13 @@ register bit[INSTR_W] r_me_instr                { pipeline = pipe.ME; };
 register bit[RF_XPR_W] r_me_regwrite              { pipeline = pipe.ME; };
 register bit[RF_XPR_W] r_me_rd                    { pipeline = pipe.ME; };
 register bit[INSTR_W] r_me_alu                  { pipeline = pipe.ME; };
+register bit[BOOLEAN_BIT] r_me_zero             {pipeline = pipe.ME; }; 
+register bit[RFWT_W] r_me_rfwt_sel              {pipeline = pipe.ME; };
+register bit[ADDR_W] r_me_target_addr              {pipeline = pipe.ME; };
+register bit[BRANCH_W] r_me_brnchop             {pipeline = pipe.ME; };
+
+signal bit[BOOLEAN_BIT] s_me_pcsrc;
+
 // -------------------------------------------------------------------------------------------------
 // Writeback stage
 // -------------------------------------------------------------------------------------------------
@@ -134,6 +160,10 @@ register bit[INSTR_W] r_wb_instr                { pipeline = pipe.WB; };
 register bit[RF_XPR_W] r_wb_regwrite              { pipeline = pipe.WB; };
 register bit[RF_XPR_W] r_wb_rd                    { pipeline = pipe.WB; };
 register bit[INSTR_W] r_wb_alu                  { pipeline = pipe.WB; };
+register bit[RFWT_W] r_wb_rfwt_sel                  { pipeline = pipe.WB; };
+
+signal bit[WORD_W] s_wb_result;
+signal bit[ADDR_W] s_wb_pc;
 
 // -------------------------------------------------------------------------------------------------
 // Pipeline control

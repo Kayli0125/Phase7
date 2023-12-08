@@ -36,6 +36,7 @@ event pipeline_control : pipeline(pipe.IF)
             pipe.IF.stall();
             codasip_info(INFO_PIPE, "Pipeline IF stall\n");
         }
+        
         if(s_id_stall){
             pipe.ID.stall();
             codasip_info(INFO_PIPE, "Pipeline ID stall\n");
